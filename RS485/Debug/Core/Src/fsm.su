@@ -1,9 +1,0 @@
-../Core/Src/fsm.c:57:6:FSM_Init	8	static
-../Core/Src/fsm.c:69:6:FSM_Run	8	static
-../Core/Src/fsm.c:86:6:FSM_Button_Handle	32	static
-../Core/Src/fsm.c:148:13:bytes_to_hex_string	32	static
-../Core/Src/fsm.c:159:13:clear_data_lines	32	static
-../Core/Src/fsm.c:170:13:Update_LCD_Layout	32	static
-../Core/Src/fsm.c:201:13:Handle_Auto_Poll	40	static
-../Core/Src/fsm.c:224:13:UI_Handle_Read_Request	88	dynamic
-../Core/Src/fsm.c:253:13:UI_Handle_Write_Request	56	static
