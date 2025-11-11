@@ -1,0 +1,2 @@
+../Core/Src/modbus_crc.c:16:10:Modbus_CRC16	4
+../Core/Src/modbus_crc.c:43:9:Modbus_Validate_CRC	2
