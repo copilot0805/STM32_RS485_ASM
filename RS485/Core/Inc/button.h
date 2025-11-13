@@ -11,7 +11,6 @@
 #include "main.h"
 
 /* Biến toàn cục để lưu trạng thái đếm (chống dội) */
-// 'extern' báo cho các file khác biết rằng biến này tồn tại
 extern uint16_t button_count[16];
 
 /* Khai báo hàm */

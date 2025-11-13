@@ -1,4 +1,4 @@
-../Core/Src/modbus_master.c:21:6:RS485_TX_Enable	1
-../Core/Src/modbus_master.c:28:6:RS485_RX_Enable	1
-../Core/Src/modbus_master.c:35:19:Modbus_Read_Registers_Raw	7
-../Core/Src/modbus_master.c:96:19:Modbus_Write_Register_Raw	6
+../Core/Src/modbus_master.c:20:6:RS485_TX_Enable	1
+../Core/Src/modbus_master.c:27:6:RS485_RX_Enable	1
+../Core/Src/modbus_master.c:34:19:Modbus_Read_Registers_Raw	7
+../Core/Src/modbus_master.c:95:19:Modbus_Write_Register_Raw	6

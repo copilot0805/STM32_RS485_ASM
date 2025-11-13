@@ -21,9 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-//#include "tim.h"  // Cần cho ngắt Timer
-#include "fsm.h"  // Thư viện FSM (máy trạng thái)
-#include "button.h" // Thư viện Button
+#include "fsm.h"
+#include "button.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -71,7 +70,7 @@ static void MX_USART3_UART_Init(void);
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim->Instance == TIM2) {
-        timer_10ms_flag = 1; // Bật cờ để main xử lý
+        timer_10ms_flag = 1; // Bật cờ
     }
 }
 /* USER CODE END 0 */

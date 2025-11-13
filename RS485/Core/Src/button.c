@@ -14,7 +14,6 @@
 extern SPI_HandleTypeDef hspi1;
 
 // Định nghĩa biến đếm (chống dội)
-// Các file khác có thể truy cập qua 'extern' trong button.h
 uint16_t button_count[16] = {0};
 
 // Biến nội bộ để lưu buffer SPI
@@ -29,15 +28,13 @@ static uint16_t button_spi_buffer = 0xFFFF; // Mặc định là 1 (không nhấ
  */
 void button_init() {
 	// Đặt chân LOAD (PL) lên mức CAO (chế độ chờ)
-	// (Đảm bảo BTN_LOAD_GPIO_Port và BTN_LOAD_Pin được định nghĩa
-	// trong file main.h do CubeMX tạo)
 	HAL_GPIO_WritePin(BTN_LOAD_GPIO_Port, BTN_LOAD_Pin, GPIO_PIN_SET);
 }
 
 /**
  * @brief  	Quét ma trận phím (đọc 16 nút)
  * @param  	None
- * @note  	Nên được gọi định kỳ (ví dụ: mỗi 10ms hoặc 50ms)
+ * @note  	Nên được gọi định kỳ
  * @retval 	None
  */
 void button_scan() {
@@ -55,8 +52,6 @@ void button_scan() {
 	HAL_SPI_Receive(&hspi1, (uint8_t*) &button_spi_buffer, 2, 10);
 
 	// 3. Xử lý logic chống dội và sắp xếp lại (re-mapping)
-	//    Phần logic re-mapping này dựa theo file mẫu của bạn.
-	//    Nếu nút của bạn không khớp, bạn có thể cần sửa lại phần này.
 	int button_index = 0;
 	uint16_t mask = 0x8000; // Bắt đầu từ bit cao nhất (MSB)
 

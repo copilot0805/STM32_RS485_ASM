@@ -29,25 +29,25 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  12 .ARM.attributes 00000030  00000000  00000000  0000b060  2**0
                   CONTENTS, READONLY
- 13 .debug_info   00012bf7  00000000  00000000  0000b090  2**0
+ 13 .debug_info   00012bf4  00000000  00000000  0000b090  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_abbrev 00002d2a  00000000  00000000  0001dc87  2**0
+ 14 .debug_abbrev 00002d2a  00000000  00000000  0001dc84  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_aranges 00001170  00000000  00000000  000209b8  2**3
+ 15 .debug_aranges 00001170  00000000  00000000  000209b0  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_rnglists 00000d90  00000000  00000000  00021b28  2**0
+ 16 .debug_rnglists 00000d90  00000000  00000000  00021b20  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_macro  00022cd3  00000000  00000000  000228b8  2**0
+ 17 .debug_macro  00022cd3  00000000  00000000  000228b0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   00014bea  00000000  00000000  0004558b  2**0
+ 18 .debug_line   00014bea  00000000  00000000  00045583  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    000d139a  00000000  00000000  0005a175  2**0
+ 19 .debug_str    000d139a  00000000  00000000  0005a16d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .comment      00000043  00000000  00000000  0012b50f  2**0
+ 20 .comment      00000043  00000000  00000000  0012b507  2**0
                   CONTENTS, READONLY
- 21 .debug_frame  00004e10  00000000  00000000  0012b554  2**2
+ 21 .debug_frame  00004e10  00000000  00000000  0012b54c  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_line_str 00000067  00000000  00000000  00130364  2**0
+ 22 .debug_line_str 00000067  00000000  00000000  0013035c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -441,8 +441,6 @@ void button_init() {
  800059c:	b580      	push	{r7, lr}
  800059e:	af00      	add	r7, sp, #0
 	// Đặt chân LOAD (PL) lên mức CAO (chế độ chờ)
-	// (Đảm bảo BTN_LOAD_GPIO_Port và BTN_LOAD_Pin được định nghĩa
-	// trong file main.h do CubeMX tạo)
 	HAL_GPIO_WritePin(BTN_LOAD_GPIO_Port, BTN_LOAD_Pin, GPIO_PIN_SET);
  80005a0:	2201      	movs	r2, #1
  80005a2:	2108      	movs	r1, #8
@@ -457,7 +455,7 @@ void button_init() {
 080005b4 <button_scan>:
  * @brief  	Quét ma trận phím (đọc 16 nút)
  * @param  	None
- * @note  	Nên được gọi định kỳ (ví dụ: mỗi 10ms hoặc 50ms)
+ * @note  	Nên được gọi định kỳ
  * @retval 	None
  */
 void button_scan() {
@@ -490,8 +488,6 @@ void button_scan() {
  80005d6:	f002 feae 	bl	8003336 <HAL_SPI_Receive>
 
 	// 3. Xử lý logic chống dội và sắp xếp lại (re-mapping)
-	//    Phần logic re-mapping này dựa theo file mẫu của bạn.
-	//    Nếu nút của bạn không khớp, bạn có thể cần sửa lại phần này.
 	int button_index = 0;
  80005da:	2300      	movs	r3, #0
  80005dc:	60fb      	str	r3, [r7, #12]
@@ -2018,7 +2014,7 @@ void lcd_show_char(uint16_t x, uint16_t y, uint8_t character, uint16_t fc,
  8001070:	f897 302c 	ldrb.w	r3, [r7, #44]	@ 0x2c
  8001074:	2b0c      	cmp	r3, #12
  8001076:	d10b      	bne.n	8001090 <lcd_show_char+0xac>
-			temp = ascii_1206[character][i]; // Giả sử bạn có font này
+			temp = ascii_1206[character][i];
  8001078:	78fa      	ldrb	r2, [r7, #3]
  800107a:	8a79      	ldrh	r1, [r7, #18]
  800107c:	4845      	ldr	r0, [pc, #276]	@ (8001194 <lcd_show_char+0x1b0>)
@@ -2367,7 +2363,6 @@ void lcd_set_direction(uint8_t dir) {
 void lcd_init(void) {
  80012b0:	b580      	push	{r7, lr}
  80012b2:	af00      	add	r7, sp, #0
-	// (Đảm bảo FSMC_RES_Pin và FSMC_BLK_Pin đã được định nghĩa trong main.h)
 	HAL_GPIO_WritePin(FSMC_RES_GPIO_Port, FSMC_RES_Pin, GPIO_PIN_RESET);
  80012b4:	2200      	movs	r2, #0
  80012b6:	f44f 5100 	mov.w	r1, #8192	@ 0x2000
@@ -2389,7 +2384,7 @@ void lcd_init(void) {
  80012dc:	2000      	movs	r0, #0
  80012de:	f7ff ffc5 	bl	800126c <lcd_set_direction>
 
-	// ---- Chuỗi khởi tạo ILI9341 (từ file của bạn) ----
+	// ---- Chuỗi khởi tạo ILI9341  ----
 	LCD_WR_REG(0XD3);
  80012e2:	20d3      	movs	r0, #211	@ 0xd3
  80012e4:	f7ff fdc0 	bl	8000e68 <LCD_WR_REG>
@@ -2736,7 +2731,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
  800157a:	681b      	ldr	r3, [r3, #0]
  800157c:	f1b3 4f80 	cmp.w	r3, #1073741824	@ 0x40000000
  8001580:	d102      	bne.n	8001588 <HAL_TIM_PeriodElapsedCallback+0x18>
-        timer_10ms_flag = 1; // Bật cờ để main xử lý
+        timer_10ms_flag = 1; // Bật cờ
  8001582:	4b04      	ldr	r3, [pc, #16]	@ (8001594 <HAL_TIM_PeriodElapsedCallback+0x24>)
  8001584:	2201      	movs	r2, #1
  8001586:	701a      	strb	r2, [r3, #0]
