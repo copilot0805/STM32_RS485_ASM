@@ -6,10 +6,9 @@
  */
 
 #include "fsm.h"
-#include <stdio.h>      // Dùng cho sprintf
-#include <stdbool.h>    // Dùng cho kiểu bool (true/false)
+#include <stdio.h>
+#include <stdbool.h>
 
-// Include tất cả các thư viện mà FSM cần điều khiển
 #include "lcd.h"
 #include "button.h"
 #include "modbus_master.h"
@@ -19,13 +18,12 @@
 #define AUTO_POLL_INTERVAL 2000 // 2 giây
 #define EXECUTE_TIMEOUT 30000   // 30 giây
 
-// !!! QUAN TRỌNG: Đặt đúng index của 3 nút nhấn
+// !!!
 #define BTN0_INDEX 0    // Nút Mode
 #define BTN1_INDEX 1    // Nút Tăng / Đọc
 #define BTN2_INDEX 2    // Nút Giảm / Ghi
 
 /* Variables -----------------------------------------------------------------*/
-// Handle UART (từ main.c)
 extern UART_HandleTypeDef huart3;
 
 // Biến FSM

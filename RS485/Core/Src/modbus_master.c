@@ -6,12 +6,11 @@
  */
 
 #include "modbus_master.h"
-#include "modbus_crc.h" // Cần để tính toán và xác thực CRC
+#include "modbus_crc.h"
 
 // Handle UART Modbus (từ main.c)
 extern UART_HandleTypeDef huart3;
 
-// (Đảm bảo các chân này được định nghĩa trong main.h)
 #define RS485_PORT RS485_EN_GPIO_Port
 #define RS485_PIN  RS485_EN_Pin
 

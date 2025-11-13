@@ -6,7 +6,7 @@
  */
 
 #include "lcd.h"
-#include "lcd_font.h" // <-- Bạn cần file này từ project mẫu
+#include "lcd_font.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -14,7 +14,7 @@
  * FSMC (Flexible Static Memory Controller) là cách STM32 giao tiếp với
  * các bộ nhớ ngoài (SRAM, NOR Flash,...) và LCD song song.
  *
- * Cấu hình FSMC của bạn (NE1, A19) tạo ra 2 địa chỉ:
+ * Cấu hình FSMC (NE1, A19) tạo ra 2 địa chỉ:
  * 1. Địa chỉ Lệnh (Command) (A19 = 0)
  * 2. Địa chỉ Dữ liệu (Data)   (A19 = 1)
  */
@@ -125,7 +125,7 @@ void lcd_set_display_off(void) {
 }
 
 /**
- * @brief  Đọc màu của 1 điểm ảnh (Không đáng tin cậy trên ILI9341)
+ * @brief  Đọc màu của 1 điểm ảnh
  */
 uint16_t lcd_read_point(uint16_t x, uint16_t y) {
 	uint16_t r = 0, g = 0, b = 0;
@@ -291,7 +291,7 @@ void lcd_show_char(uint16_t x, uint16_t y, uint8_t character, uint16_t fc,
 	lcd_set_address(x, y, x + sizex - 1, y + sizey - 1);
 	for (i = 0; i < TypefaceNum; i++) {
 		if (sizey == 12)
-			temp = ascii_1206[character][i]; // Giả sử bạn có font này
+			temp = ascii_1206[character][i];
 		else if (sizey == 16)
 			temp = ascii_1608[character][i];
 		else if (sizey == 24)
@@ -441,7 +441,6 @@ void lcd_set_direction(uint8_t dir) {
  * @brief  Khởi tạo LCD (chuỗi lệnh cho ILI9341)
  */
 void lcd_init(void) {
-	// (Đảm bảo FSMC_RES_Pin và FSMC_BLK_Pin đã được định nghĩa trong main.h)
 	HAL_GPIO_WritePin(FSMC_RES_GPIO_Port, FSMC_RES_Pin, GPIO_PIN_RESET);
 	HAL_Delay(500);
 	HAL_GPIO_WritePin(FSMC_RES_GPIO_Port, FSMC_RES_Pin, GPIO_PIN_SET);
@@ -449,7 +448,7 @@ void lcd_init(void) {
 
 	lcd_set_direction(DFT_SCAN_DIR); // Cài đặt chiều rộng/cao
 
-	// ---- Chuỗi khởi tạo ILI9341 (từ file của bạn) ----
+	// ---- Chuỗi khởi tạo ILI9341  ----
 	LCD_WR_REG(0XD3);
 	lcddev.id = LCD_RD_DATA();
 	lcddev.id = LCD_RD_DATA();
