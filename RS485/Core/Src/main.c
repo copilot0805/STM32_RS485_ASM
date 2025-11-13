@@ -21,9 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-//#include "tim.h"  // Cần cho ngắt Timer
-#include "modbus_crc.h" // Slave cũng cần CRC
-#include <string.h>     // Dùng cho memcpy
+#include "modbus_crc.h"
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -110,7 +109,6 @@ void Handle_Read_Request(uint8_t *frame) {
 
     // Kiểm tra địa chỉ có hợp lệ không
     if ((reg_addr + num_regs) > MAX_REGISTERS) {
-        // (Trong dự án thực tế, bạn sẽ gửi mã lỗi Modbus)
         return;
     }
 
@@ -146,10 +144,10 @@ void Handle_Write_Request(uint8_t *frame) {
         return; // (Gửi mã lỗi)
     }
 
-    // Ghi giá trị vào "dữ liệu giả" (Đây là kịch bản test của bạn)
+    // Ghi giá trị vào "dữ liệu giả"
     holding_registers[reg_addr] = value;
 
-    // Phản hồi của 0x06 là một bản sao (echo) của yêu cầu
+    // Phản hồi của 0x06 là một bản sao (echo)
     Modbus_Send_Response(frame, 8);
 }
 

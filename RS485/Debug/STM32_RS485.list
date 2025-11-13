@@ -29,9 +29,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  12 .ARM.attributes 00000030  00000000  00000000  0000400c  2**0
                   CONTENTS, READONLY
- 13 .debug_info   000084f1  00000000  00000000  0000403c  2**0
+ 13 .debug_info   000084f2  00000000  00000000  0000403c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_abbrev 00001767  00000000  00000000  0000c52d  2**0
+ 14 .debug_abbrev 00001765  00000000  00000000  0000c52e  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_aranges 00000720  00000000  00000000  0000dc98  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -485,7 +485,6 @@ void Handle_Read_Request(uint8_t *frame) {
  8000596:	4413      	add	r3, r2
  8000598:	2b0a      	cmp	r3, #10
  800059a:	dd01      	ble.n	80005a0 <Handle_Read_Request+0x50>
-        // (Trong dự án thực tế, bạn sẽ gửi mã lỗi Modbus)
         return;
  800059c:	46b5      	mov	sp, r6
  800059e:	e07b      	b.n	8000698 <Handle_Read_Request+0x148>
@@ -673,14 +672,14 @@ void Handle_Write_Request(uint8_t *frame) {
         return; // (Gửi mã lỗi)
     }
 
-    // Ghi giá trị vào "dữ liệu giả" (Đây là kịch bản test của bạn)
+    // Ghi giá trị vào "dữ liệu giả"
     holding_registers[reg_addr] = value;
  80006e4:	89fb      	ldrh	r3, [r7, #14]
  80006e6:	4906      	ldr	r1, [pc, #24]	@ (8000700 <Handle_Write_Request+0x5c>)
  80006e8:	89ba      	ldrh	r2, [r7, #12]
  80006ea:	f821 2013 	strh.w	r2, [r1, r3, lsl #1]
 
-    // Phản hồi của 0x06 là một bản sao (echo) của yêu cầu
+    // Phản hồi của 0x06 là một bản sao (echo)
     Modbus_Send_Response(frame, 8);
  80006ee:	2108      	movs	r1, #8
  80006f0:	6878      	ldr	r0, [r7, #4]
