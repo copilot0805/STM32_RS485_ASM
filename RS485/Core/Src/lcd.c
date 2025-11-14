@@ -24,7 +24,6 @@
 
 // Chân A19 được dùng làm chân Register Select (RS)
 // 1 << 19 (dịch trái 19 bit) = 0x00080000
-// A19 là bit thứ 20 (tính từ 0) nếu bus 16-bit
 #define LCD_RS_PIN_OFFSET ((uint32_t)(1 << (19 + 1)))
 
 // Địa chỉ để ghi Lệnh (Command) (RS=0)

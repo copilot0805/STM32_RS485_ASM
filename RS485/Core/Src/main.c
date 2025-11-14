@@ -110,7 +110,7 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  // Khởi tạo Máy trạng thái (FSM sẽ tự động gọi lcd_init, button_init)
+  // Khởi tạo Máy trạng thái
     FSM_Init();
 
     // Bắt đầu Timer ngắt (10ms)

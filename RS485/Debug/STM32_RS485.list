@@ -29,9 +29,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  12 .ARM.attributes 00000030  00000000  00000000  0000b060  2**0
                   CONTENTS, READONLY
- 13 .debug_info   00012bf4  00000000  00000000  0000b090  2**0
+ 13 .debug_info   00012bf6  00000000  00000000  0000b090  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_abbrev 00002d2a  00000000  00000000  0001dc84  2**0
+ 14 .debug_abbrev 00002d29  00000000  00000000  0001dc86  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_aranges 00001170  00000000  00000000  000209b0  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -499,7 +499,7 @@ void button_scan() {
  80005e4:	2300      	movs	r3, #0
  80005e6:	607b      	str	r3, [r7, #4]
  80005e8:	e047      	b.n	800067a <button_scan+0xc6>
-		// --- Logic Re-mapping (từ file mẫu) ---
+		//Logic Re-mapping
 		if (i >= 0 && i <= 3) {
  80005ea:	687b      	ldr	r3, [r7, #4]
  80005ec:	2b00      	cmp	r3, #0
@@ -542,7 +542,7 @@ void button_scan() {
  800062a:	f1c3 0317 	rsb	r3, r3, #23
  800062e:	60fb      	str	r3, [r7, #12]
 		}
-		// --- Kết thúc Logic Re-mapping ---
+		//Kết thúc Logic Re-mapping ---
 
 		// Kiểm tra bit: Nút nhấn là active-low (nhấn = 0)
 		if (button_spi_buffer & mask) {
@@ -2784,7 +2784,7 @@ int main(void)
  80015b4:	f000 f906 	bl	80017c4 <MX_USART3_UART_Init>
   /* USER CODE BEGIN 2 */
 
-  // Khởi tạo Máy trạng thái (FSM sẽ tự động gọi lcd_init, button_init)
+  // Khởi tạo Máy trạng thái
     FSM_Init();
  80015b8:	f7ff f870 	bl	800069c <FSM_Init>
 
@@ -3642,7 +3642,7 @@ __STATIC_FORCEINLINE void __disable_irq(void)
  * @param  length: Độ dài của dữ liệu (KHÔNG bao gồm 2 byte CRC).
  * @retval Giá trị CRC 16-bit.
  */
-uint16_t Modbus_CRC16(uint8_t *buffer, uint16_t length) {
+uint16_t Modbus_CRC16(uint8_t *buffer, uint16_t length) { //CRC-16/MODBUS bitwise (LSB-first)
  8001a94:	b480      	push	{r7}
  8001a96:	b085      	sub	sp, #20
  8001a98:	af00      	add	r7, sp, #0
@@ -3707,11 +3707,10 @@ uint16_t Modbus_CRC16(uint8_t *buffer, uint16_t length) {
  8001afc:	887b      	ldrh	r3, [r7, #2]
  8001afe:	429a      	cmp	r2, r3
  8001b00:	d3d4      	bcc.n	8001aac <Modbus_CRC16+0x18>
+            }
         }
     }
 
-    // Kết quả CRC là 2 byte được đảo ngược (Low byte first)
-    // Nhưng hàm này trả về giá trị 16-bit, hàm gửi sẽ tự xử lý
     return crc;
  8001b02:	89fb      	ldrh	r3, [r7, #14]
 }
@@ -3928,7 +3927,6 @@ void RS485_RX_Enable(void) {
  8001c2e:	f7ff ffab 	bl	8001b88 <RS485_RX_Enable>
 
     // 3. Nhận phản hồi
-    // (Lưu ý: 200ms là thời gian chờ. Nếu Slave chậm, bạn cần tăng lên)
     if (HAL_UART_Receive(huart, raw_response_dest, rx_buffer_size, 200) != HAL_OK) {
  8001c32:	7efb      	ldrb	r3, [r7, #27]
  8001c34:	b29a      	uxth	r2, r3
@@ -4160,7 +4158,7 @@ HAL_StatusTypeDef Modbus_Write_Register_Raw(UART_HandleTypeDef *huart,
         }
     }
 
-    // (Kiểm tra CRC một lần nữa cho chắc)
+    // Kiểm tra CRC
     if (Modbus_Validate_CRC(raw_response_dest, 8) != 1) {
  8001d92:	2108      	movs	r1, #8
  8001d94:	6ab8      	ldr	r0, [r7, #40]	@ 0x28

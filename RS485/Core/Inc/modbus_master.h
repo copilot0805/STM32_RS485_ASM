@@ -8,7 +8,7 @@
 #ifndef INC_MODBUS_MASTER_H_
 #define INC_MODBUS_MASTER_H_
 
-#include "main.h" // Cần cho HAL_StatusTypeDef và UART_HandleTypeDef
+#include "main.h"
 
 /**
  * @brief  Kích hoạt chế độ GỬI (TX) trên RS485.

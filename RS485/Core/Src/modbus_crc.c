@@ -13,7 +13,7 @@
  * @param  length: Độ dài của dữ liệu (KHÔNG bao gồm 2 byte CRC).
  * @retval Giá trị CRC 16-bit.
  */
-uint16_t Modbus_CRC16(uint8_t *buffer, uint16_t length) {
+uint16_t Modbus_CRC16(uint8_t *buffer, uint16_t length) { //CRC-16/MODBUS bitwise (LSB-first)
     uint16_t crc = 0xFFFF; // Giá trị khởi tạo
 
     for (uint16_t pos = 0; pos < length; pos++) {
@@ -29,8 +29,6 @@ uint16_t Modbus_CRC16(uint8_t *buffer, uint16_t length) {
         }
     }
 
-    // Kết quả CRC là 2 byte được đảo ngược (Low byte first)
-    // Nhưng hàm này trả về giá trị 16-bit, hàm gửi sẽ tự xử lý
     return crc;
 }
 

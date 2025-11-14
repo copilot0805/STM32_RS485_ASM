@@ -10,7 +10,6 @@
 
 /* Variables */
 // Khai báo handle SPI từ file main.c
-// CubeMX sẽ tự động tạo dòng này trong file spi.c
 extern SPI_HandleTypeDef hspi1;
 
 // Định nghĩa biến đếm (chống dội)
@@ -56,7 +55,7 @@ void button_scan() {
 	uint16_t mask = 0x8000; // Bắt đầu từ bit cao nhất (MSB)
 
 	for (int i = 0; i < 16; i++) {
-		// --- Logic Re-mapping (từ file mẫu) ---
+		//Logic Re-mapping
 		if (i >= 0 && i <= 3) {
 			button_index = i + 4;
 		} else if (i >= 4 && i <= 7) {
@@ -66,7 +65,7 @@ void button_scan() {
 		} else {
 			button_index = 23 - i;
 		}
-		// --- Kết thúc Logic Re-mapping ---
+		//Kết thúc Logic Re-mapping ---
 
 		// Kiểm tra bit: Nút nhấn là active-low (nhấn = 0)
 		if (button_spi_buffer & mask) {

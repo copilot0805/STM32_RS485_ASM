@@ -8,7 +8,7 @@
 #ifndef INC_MODBUS_CRC_H_
 #define INC_MODBUS_CRC_H_
 
-#include "main.h" // Cần cho kiểu dữ liệu uint8_t, uint16_t
+#include "main.h"
 
 /**
  * @brief  Tính toán CRC-16/MODBUS.
