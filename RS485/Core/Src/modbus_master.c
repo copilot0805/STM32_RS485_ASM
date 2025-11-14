@@ -8,7 +8,6 @@
 #include "modbus_master.h"
 #include "modbus_crc.h"
 
-// Handle UART Modbus (từ main.c)
 extern UART_HandleTypeDef huart3;
 
 #define RS485_PORT RS485_EN_GPIO_Port
@@ -65,7 +64,6 @@ HAL_StatusTypeDef Modbus_Read_Registers_Raw(UART_HandleTypeDef *huart,
     RS485_RX_Enable(); // Chuyển về chế độ Nhận ngay lập tức
 
     // 3. Nhận phản hồi
-    // (Lưu ý: 200ms là thời gian chờ. Nếu Slave chậm, bạn cần tăng lên)
     if (HAL_UART_Receive(huart, raw_response_dest, rx_buffer_size, 200) != HAL_OK) {
         return HAL_TIMEOUT; // Lỗi Timeout
     }
@@ -133,7 +131,7 @@ HAL_StatusTypeDef Modbus_Write_Register_Raw(UART_HandleTypeDef *huart,
         }
     }
 
-    // (Kiểm tra CRC một lần nữa cho chắc)
+    // Kiểm tra CRC
     if (Modbus_Validate_CRC(raw_response_dest, 8) != 1) {
         return HAL_ERROR; // Lỗi CRC
     }
