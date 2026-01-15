@@ -122,6 +122,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	      // Tự động xóa lỗi nếu UART bị treo
+	      if (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_ORE)) {
+	    	  __HAL_UART_CLEAR_OREFLAG(&huart3);
+	      // Hoặc đọc DR: uint32_t temp = huart3.Instance->DR;
+	      }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

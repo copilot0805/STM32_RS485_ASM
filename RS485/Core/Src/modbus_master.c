@@ -61,6 +61,9 @@ HAL_StatusTypeDef Modbus_Read_Registers_Raw(UART_HandleTypeDef *huart,
         RS485_RX_Enable(); // Luôn chuyển về RX dù lỗi
         return HAL_ERROR;
     }
+
+    while(__HAL_UART_GET_FLAG(huart, UART_FLAG_TC) == RESET);
+
     RS485_RX_Enable(); // Chuyển về chế độ Nhận ngay lập tức
 
     // 3. Nhận phản hồi
@@ -116,6 +119,9 @@ HAL_StatusTypeDef Modbus_Write_Register_Raw(UART_HandleTypeDef *huart,
         RS485_RX_Enable();
         return HAL_ERROR;
     }
+
+    while(__HAL_UART_GET_FLAG(huart, UART_FLAG_TC) == RESET);
+
     RS485_RX_Enable();
 
     // 3. Nhận phản hồi (Phản hồi 0x06 là một bản echo, 8 byte)
