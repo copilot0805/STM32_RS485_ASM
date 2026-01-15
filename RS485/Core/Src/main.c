@@ -114,8 +114,15 @@ void RS485_RX_Enable(void) {
  * @brief  Gửi gói tin phản hồi
  */
 void Modbus_Send_Response(uint8_t *data, uint16_t len) {
+	//bat che do gui
     RS485_TX_Enable();
+
+    //day du lieu vao bo dem
     HAL_UART_Transmit(&huart3, data, len, 100);
+
+    //cho gui xong
+    while(__HAL_UART_GET_FLAG(&huart3, UART_FLAG_TC) == RESET);
+
     RS485_RX_Enable(); // Chuyển về nhận ngay
 }
 
