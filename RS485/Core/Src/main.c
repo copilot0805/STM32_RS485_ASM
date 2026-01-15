@@ -21,6 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "fsm_slave.h"
+#include "button.h"
 #include "modbus_crc.h"
 #include <string.h>
 /* USER CODE END Includes */
@@ -31,7 +33,7 @@
 // SLAVE 1: Đặt giá trị này là 1
 // SLAVE 2: Đặt giá trị này là 2
 #define MY_SLAVE_ID 1
-
+//
 #define MAX_REGISTERS 10    // Số lượng thanh ghi "giả"
 #define RX_BUFFER_SIZE 256  // Kích thước buffer nhận tối đa
 
@@ -48,16 +50,30 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+SPI_HandleTypeDef hspi1;
+
+TIM_HandleTypeDef htim2;
+
 UART_HandleTypeDef huart3;
+
+SRAM_HandleTypeDef hsram1;
 
 /* USER CODE BEGIN PV */
 
-// Đây là "dữ liệu giả" (holding registers)
+//// Đây là "dữ liệu giả" (holding registers)
 int16_t holding_registers[MAX_REGISTERS] = {0};
 
-// Buffer nhận dữ liệu qua UART
+//// Buffer nhận dữ liệu qua UART
 uint8_t rx_buffer[RX_BUFFER_SIZE];
 volatile uint16_t rx_len = 0; // Kích thước dữ liệu ngắt nhận được
+
+// Biến my_slave_id đã được extern trong fsm_slave.h, không cần khai báo lại
+extern uint8_t my_slave_id;
+
+// Dữ liệu giả lập
+//int16_t holding_registers[10] = {0};
+uint8_t rx_buffer[256];
+volatile uint8_t timer_10ms_flag = 0;
 
 /* USER CODE END PV */
 
@@ -65,6 +81,9 @@ volatile uint16_t rx_len = 0; // Kích thước dữ liệu ngắt nhận đư�
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART3_UART_Init(void);
+static void MX_FSMC_Init(void);
+static void MX_SPI1_Init(void);
+static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 // Khai báo các hàm helper cho Slave
 void RS485_TX_Enable(void);
@@ -116,7 +135,7 @@ void Handle_Read_Request(uint8_t *frame) {
     uint8_t resp_len = 5 + (num_regs * 2);
     uint8_t resp[resp_len];
 
-    resp[0] = MY_SLAVE_ID;
+    resp[0] = my_slave_id;
     resp[1] = 0x03;
     resp[2] = num_regs * 2; // Số byte dữ liệu
 
@@ -156,7 +175,7 @@ void Handle_Write_Request(uint8_t *frame) {
  */
 void Process_Modbus_Frame(uint8_t *frame, uint16_t len) {
     // 1. Kiểm tra ID
-    if (frame[0] != MY_SLAVE_ID) {
+    if (frame[0] != my_slave_id) {
         return; // Không phải cho mình, bỏ qua
     }
 
@@ -176,6 +195,14 @@ void Process_Modbus_Frame(uint8_t *frame, uint16_t len) {
         default:
             // (Không hỗ trợ mã hàm này, có thể gửi mã lỗi)
             break;
+    }
+}
+
+// --- CHANGED: Thêm Callback Timer để bật cờ 10ms ---
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    if (htim->Instance == TIM2) {
+        timer_10ms_flag = 1;
     }
 }
 /* USER CODE END 0 */
@@ -210,40 +237,56 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART3_UART_Init();
+  MX_FSMC_Init();
+  MX_SPI1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  // 1. Khởi tạo FSM (LCD, Button, Flash, Load ID)
+  FSM_Slave_Init();
 
-  // Mô phỏng dữ liệu (ví dụ: nhiệt độ ở thanh ghi 0)
-    holding_registers[0] = 253; // 25.3 độ C
+  // 2. Bắt đầu Timer ngắt
+    HAL_TIM_Base_Start_IT(&htim2);
 
-    RS485_RX_Enable(); // Slave luôn ở chế độ Nhận
-
-    // Kích hoạt ngắt UART Receive to Idle (Tốt nhất cho Modbus)
-    // Nó sẽ kích hoạt ngắt khi đường truyền rảnh (idle)
-    HAL_UARTEx_ReceiveToIdle_IT(&huart3, rx_buffer, RX_BUFFER_SIZE);
-
+    // 3. Modbus Config
+    holding_registers[0] = 250; // 25.0 độ C
+    RS485_RX_Enable();
+    HAL_UARTEx_ReceiveToIdle_IT(&huart3, rx_buffer, 256); // Sửa lại size buffer số cứng nếu cần
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+    while (1)
+    {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  // Làm cho "dữ liệu giả" sống động
-	      HAL_Delay(1000);
+        // 1. Chạy FSM liên tục (Cập nhật màn hình, chuyển trạng thái)
+        FSM_Slave_Run();
 
-	      // Chỉ tăng nếu nó không bị Master reset về 0
-	      if (holding_registers[0] != 0) {
-	          holding_registers[0]++;
-	      }
+        // 2. Tác vụ định kỳ 10ms (Thay thế HAL_Delay)
+        if (timer_10ms_flag == 1) {
+            timer_10ms_flag = 0; // Xóa cờ
 
-	      // Giới hạn nhiệt độ (ví dụ)
-	      if (holding_registers[0] > 500) {
-	          holding_registers[0] = 250;
-	      }
+            // Quét nút và xử lý logic nút cho FSM
+            button_scan();
+            FSM_Slave_Button_Handle();
 
-	    }
+            // --- LOGIC MÔ PHỎNG NHIỆT ĐỘ (Non-blocking) ---
+            static uint8_t sim_tick = 0;
+            sim_tick++;
+            if (sim_tick >= 100) { // 10ms * 100 = 1000ms (1 giây)
+                sim_tick = 0;
+
+                // Tăng nhiệt độ giả
+                if (holding_registers[0] != 0) {
+                    holding_registers[0]++;
+                }
+                if (holding_registers[0] > 500) {
+                    holding_registers[0] = 250;
+                }
+            }
+        }
+    }
   /* USER CODE END 3 */
 }
 
@@ -285,12 +328,95 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV4;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief SPI1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SPI1_Init(void)
+{
+
+  /* USER CODE BEGIN SPI1_Init 0 */
+
+  /* USER CODE END SPI1_Init 0 */
+
+  /* USER CODE BEGIN SPI1_Init 1 */
+
+  /* USER CODE END SPI1_Init 1 */
+  /* SPI1 parameter configuration*/
+  hspi1.Instance = SPI1;
+  hspi1.Init.Mode = SPI_MODE_MASTER;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SPI1_Init 2 */
+
+  /* USER CODE END SPI1_Init 2 */
+
+}
+
+/**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 839;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 99;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+
 }
 
 /**
@@ -339,10 +465,12 @@ static void MX_GPIO_Init(void)
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(FSMC_RES_GPIO_Port, FSMC_RES_Pin, GPIO_PIN_RESET);
@@ -387,6 +515,67 @@ static void MX_GPIO_Init(void)
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
   /* USER CODE END MX_GPIO_Init_2 */
+}
+
+/* FSMC initialization function */
+static void MX_FSMC_Init(void)
+{
+
+  /* USER CODE BEGIN FSMC_Init 0 */
+
+  /* USER CODE END FSMC_Init 0 */
+
+  FSMC_NORSRAM_TimingTypeDef Timing = {0};
+  FSMC_NORSRAM_TimingTypeDef ExtTiming = {0};
+
+  /* USER CODE BEGIN FSMC_Init 1 */
+
+  /* USER CODE END FSMC_Init 1 */
+
+  /** Perform the SRAM1 memory initialization sequence
+  */
+  hsram1.Instance = FSMC_NORSRAM_DEVICE;
+  hsram1.Extended = FSMC_NORSRAM_EXTENDED_DEVICE;
+  /* hsram1.Init */
+  hsram1.Init.NSBank = FSMC_NORSRAM_BANK1;
+  hsram1.Init.DataAddressMux = FSMC_DATA_ADDRESS_MUX_DISABLE;
+  hsram1.Init.MemoryType = FSMC_MEMORY_TYPE_SRAM;
+  hsram1.Init.MemoryDataWidth = FSMC_NORSRAM_MEM_BUS_WIDTH_16;
+  hsram1.Init.BurstAccessMode = FSMC_BURST_ACCESS_MODE_DISABLE;
+  hsram1.Init.WaitSignalPolarity = FSMC_WAIT_SIGNAL_POLARITY_LOW;
+  hsram1.Init.WrapMode = FSMC_WRAP_MODE_DISABLE;
+  hsram1.Init.WaitSignalActive = FSMC_WAIT_TIMING_BEFORE_WS;
+  hsram1.Init.WriteOperation = FSMC_WRITE_OPERATION_ENABLE;
+  hsram1.Init.WaitSignal = FSMC_WAIT_SIGNAL_DISABLE;
+  hsram1.Init.ExtendedMode = FSMC_EXTENDED_MODE_ENABLE;
+  hsram1.Init.AsynchronousWait = FSMC_ASYNCHRONOUS_WAIT_DISABLE;
+  hsram1.Init.WriteBurst = FSMC_WRITE_BURST_DISABLE;
+  hsram1.Init.PageSize = FSMC_PAGE_SIZE_NONE;
+  /* Timing */
+  Timing.AddressSetupTime = 0xf;
+  Timing.AddressHoldTime = 15;
+  Timing.DataSetupTime = 60;
+  Timing.BusTurnAroundDuration = 0;
+  Timing.CLKDivision = 16;
+  Timing.DataLatency = 17;
+  Timing.AccessMode = FSMC_ACCESS_MODE_A;
+  /* ExtTiming */
+  ExtTiming.AddressSetupTime = 8;
+  ExtTiming.AddressHoldTime = 15;
+  ExtTiming.DataSetupTime = 9;
+  ExtTiming.BusTurnAroundDuration = 0;
+  ExtTiming.CLKDivision = 16;
+  ExtTiming.DataLatency = 17;
+  ExtTiming.AccessMode = FSMC_ACCESS_MODE_A;
+
+  if (HAL_SRAM_Init(&hsram1, &Timing, &ExtTiming) != HAL_OK)
+  {
+    Error_Handler( );
+  }
+
+  /* USER CODE BEGIN FSMC_Init 2 */
+
+  /* USER CODE END FSMC_Init 2 */
 }
 
 /* USER CODE BEGIN 4 */
