@@ -14,7 +14,7 @@
 #include "modbus_master.h"
 
 /* Define --------------------------------------------------------------------*/
-#define MAX_SLAVE_ID 2
+#define MAX_SLAVE_ID 20
 #define AUTO_POLL_INTERVAL 2000 // 2 giây
 #define EXECUTE_TIMEOUT 30000   // 30 giây
 
@@ -113,13 +113,13 @@ void FSM_Button_Handle(void) {
             if (button_count[BTN1_INDEX] == 1) { // Tăng ID
                 target_slave_id++;
                 if (target_slave_id > MAX_SLAVE_ID) target_slave_id = 1;
-                sprintf(lcd_line, "TARGET: S%d", target_slave_id);
+                sprintf(lcd_line, "TARGET: S%d  ", target_slave_id);
                 lcd_show_string(10, 50, lcd_line, BLUE, WHITE, 24, 0);
             }
             if (button_count[BTN2_INDEX] == 1) { // Giảm ID
                 if (target_slave_id > 1) target_slave_id--;
                 else target_slave_id = MAX_SLAVE_ID;
-                sprintf(lcd_line, "TARGET: S%d", target_slave_id);
+                sprintf(lcd_line, "TARGET: S%d  ", target_slave_id);
                 lcd_show_string(10, 50, lcd_line, BLUE, WHITE, 24, 0);
             }
             break;

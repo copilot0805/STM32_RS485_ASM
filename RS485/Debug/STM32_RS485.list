@@ -7,19 +7,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   1 .text         00005f74  08000190  08000190  00001190  2**4
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .rodata       000034f0  08006104  08006104  00007104  2**2
+  2 .rodata       00003500  08006104  08006104  00007104  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  3 .ARM.extab    00000000  080095f4  080095f4  0000b060  2**0
+  3 .ARM.extab    00000000  08009604  08009604  0000b060  2**0
                   CONTENTS, READONLY
-  4 .ARM          00000008  080095f4  080095f4  0000a5f4  2**2
+  4 .ARM          00000008  08009604  08009604  0000a604  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  5 .preinit_array 00000000  080095fc  080095fc  0000b060  2**0
+  5 .preinit_array 00000000  0800960c  0800960c  0000b060  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .init_array   00000004  080095fc  080095fc  0000a5fc  2**2
+  6 .init_array   00000004  0800960c  0800960c  0000a60c  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  7 .fini_array   00000004  08009600  08009600  0000a600  2**2
+  7 .fini_array   00000004  08009610  08009610  0000a610  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  8 .data         00000060  20000000  08009604  0000b000  2**2
+  8 .data         00000060  20000000  08009614  0000b000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
   9 .ccmram       00000000  10000000  10000000  0000b060  2**0
                   CONTENTS
@@ -41,9 +41,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  18 .debug_line   00014bea  00000000  00000000  00045583  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    000d139a  00000000  00000000  0005a16d  2**0
+ 19 .debug_str    000d139b  00000000  00000000  0005a16d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .comment      00000043  00000000  00000000  0012b507  2**0
+ 20 .comment      00000043  00000000  00000000  0012b508  2**0
                   CONTENTS, READONLY
  21 .debug_frame  00004e10  00000000  00000000  0012b54c  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -801,12 +801,12 @@ void FSM_Button_Handle(void) {
  80007a2:	4b39      	ldr	r3, [pc, #228]	@ (8000888 <FSM_Button_Handle+0x174>)
  80007a4:	781b      	ldrb	r3, [r3, #0]
  80007a6:	b2db      	uxtb	r3, r3
- 80007a8:	2b02      	cmp	r3, #2
+ 80007a8:	2b14      	cmp	r3, #20
  80007aa:	d902      	bls.n	80007b2 <FSM_Button_Handle+0x9e>
  80007ac:	4b36      	ldr	r3, [pc, #216]	@ (8000888 <FSM_Button_Handle+0x174>)
  80007ae:	2201      	movs	r2, #1
  80007b0:	701a      	strb	r2, [r3, #0]
-                sprintf(lcd_line, "TARGET: S%d", target_slave_id);
+                sprintf(lcd_line, "TARGET: S%d  ", target_slave_id);
  80007b2:	4b35      	ldr	r3, [pc, #212]	@ (8000888 <FSM_Button_Handle+0x174>)
  80007b4:	781b      	ldrb	r3, [r3, #0]
  80007b6:	b2db      	uxtb	r3, r3
@@ -847,9 +847,9 @@ void FSM_Button_Handle(void) {
  80007fc:	e002      	b.n	8000804 <FSM_Button_Handle+0xf0>
                 else target_slave_id = MAX_SLAVE_ID;
  80007fe:	4b22      	ldr	r3, [pc, #136]	@ (8000888 <FSM_Button_Handle+0x174>)
- 8000800:	2202      	movs	r2, #2
+ 8000800:	2214      	movs	r2, #20
  8000802:	701a      	strb	r2, [r3, #0]
-                sprintf(lcd_line, "TARGET: S%d", target_slave_id);
+                sprintf(lcd_line, "TARGET: S%d  ", target_slave_id);
  8000804:	4b20      	ldr	r3, [pc, #128]	@ (8000888 <FSM_Button_Handle+0x174>)
  8000806:	781b      	ldrb	r3, [r3, #0]
  8000808:	b2db      	uxtb	r3, r3
@@ -990,7 +990,7 @@ static void bytes_to_hex_string(uint8_t *bytes, uint16_t len, char *out_string) 
  80008fa:	46bd      	mov	sp, r7
  80008fc:	bd80      	pop	{r7, pc}
  80008fe:	bf00      	nop
- 8000900:	08006110 	.word	0x08006110
+ 8000900:	08006114 	.word	0x08006114
 
 08000904 <clear_data_lines>:
 
@@ -1058,7 +1058,7 @@ static void clear_data_lines(void) {
  8000982:	46bd      	mov	sp, r7
  8000984:	bd80      	pop	{r7, pc}
  8000986:	bf00      	nop
- 8000988:	08006118 	.word	0x08006118
+ 8000988:	0800611c 	.word	0x0800611c
 
 0800098c <Update_LCD_Layout>:
 
@@ -1236,18 +1236,18 @@ static void Update_LCD_Layout(FSM_State_t newState) {
  8000ad6:	3708      	adds	r7, #8
  8000ad8:	46bd      	mov	sp, r7
  8000ada:	bd80      	pop	{r7, pc}
- 8000adc:	08006134 	.word	0x08006134
+ 8000adc:	08006138 	.word	0x08006138
  8000ae0:	200000a8 	.word	0x200000a8
- 8000ae4:	08006140 	.word	0x08006140
- 8000ae8:	0800614c 	.word	0x0800614c
+ 8000ae4:	08006144 	.word	0x08006144
+ 8000ae8:	08006150 	.word	0x08006150
  8000aec:	20000003 	.word	0x20000003
  8000af0:	200000a0 	.word	0x200000a0
- 8000af4:	08006158 	.word	0x08006158
+ 8000af4:	0800615c 	.word	0x0800615c
  8000af8:	20000002 	.word	0x20000002
- 8000afc:	08006104 	.word	0x08006104
- 8000b00:	08006168 	.word	0x08006168
- 8000b04:	0800617c 	.word	0x0800617c
- 8000b08:	08006184 	.word	0x08006184
+ 8000afc:	0800616c 	.word	0x0800616c
+ 8000b00:	08006178 	.word	0x08006178
+ 8000b04:	0800618c 	.word	0x0800618c
+ 8000b08:	08006194 	.word	0x08006194
  8000b0c:	200000a4 	.word	0x200000a4
 
 08000b10 <Handle_Auto_Poll>:
@@ -1365,11 +1365,11 @@ static void Handle_Auto_Poll(void) {
  8000bde:	bd80      	pop	{r7, pc}
  8000be0:	200000a0 	.word	0x200000a0
  8000be4:	20000003 	.word	0x20000003
- 8000be8:	0800618c 	.word	0x0800618c
+ 8000be8:	0800619c 	.word	0x0800619c
  8000bec:	2000018c 	.word	0x2000018c
- 8000bf0:	08006194 	.word	0x08006194
+ 8000bf0:	080061a4 	.word	0x080061a4
  8000bf4:	200000a8 	.word	0x200000a8
- 8000bf8:	08006198 	.word	0x08006198
+ 8000bf8:	080061a8 	.word	0x080061a8
 
 08000bfc <UI_Handle_Read_Request>:
 
@@ -1549,7 +1549,7 @@ static void UI_Handle_Read_Request(uint8_t slave_id) {
  8000d5a:	bf00      	nop
  8000d5c:	200000a8 	.word	0x200000a8
  8000d60:	2000018c 	.word	0x2000018c
- 8000d64:	080061a0 	.word	0x080061a0
+ 8000d64:	080061b0 	.word	0x080061b0
 
 08000d68 <UI_Handle_Write_Request>:
 
@@ -1685,7 +1685,7 @@ static void UI_Handle_Write_Request(uint8_t slave_id) {
  8000e5a:	bd80      	pop	{r7, pc}
  8000e5c:	200000a8 	.word	0x200000a8
  8000e60:	2000018c 	.word	0x2000018c
- 8000e64:	080061a0 	.word	0x080061a0
+ 8000e64:	080061b0 	.word	0x080061b0
 
 08000e68 <LCD_WR_REG>:
 
@@ -2178,10 +2178,10 @@ void lcd_show_char(uint16_t x, uint16_t y, uint8_t character, uint16_t fc,
  800118e:	46bd      	mov	sp, r7
  8001190:	bd90      	pop	{r4, r7, pc}
  8001192:	bf00      	nop
- 8001194:	080061b4 	.word	0x080061b4
- 8001198:	08006628 	.word	0x08006628
- 800119c:	08006c18 	.word	0x08006c18
- 80011a0:	08007de8 	.word	0x08007de8
+ 8001194:	080061c4 	.word	0x080061c4
+ 8001198:	08006638 	.word	0x08006638
+ 800119c:	08006c28 	.word	0x08006c28
+ 80011a0:	08007df8 	.word	0x08007df8
 
 080011a4 <lcd_show_string>:
 
@@ -5035,7 +5035,7 @@ LoopFillZerobss:
   ldr r1, =_edata
  8002180:	20000060 	.word	0x20000060
   ldr r2, =_sidata
- 8002184:	08009604 	.word	0x08009604
+ 8002184:	08009614 	.word	0x08009614
   ldr r2, =_sbss
  8002188:	20000060 	.word	0x20000060
   ldr r4, =_ebss
@@ -7663,7 +7663,7 @@ HAL_StatusTypeDef HAL_RCC_ClockConfig(const RCC_ClkInitTypeDef  *RCC_ClkInitStru
  800301a:	bf00      	nop
  800301c:	40023c00 	.word	0x40023c00
  8003020:	40023800 	.word	0x40023800
- 8003024:	080095a8 	.word	0x080095a8
+ 8003024:	080095b8 	.word	0x080095b8
  8003028:	20000004 	.word	0x20000004
  800302c:	20000008 	.word	0x20000008
 
@@ -7920,7 +7920,7 @@ uint32_t HAL_RCC_GetPCLK1Freq(void)
  80031f0:	4618      	mov	r0, r3
  80031f2:	bd80      	pop	{r7, pc}
  80031f4:	40023800 	.word	0x40023800
- 80031f8:	080095b8 	.word	0x080095b8
+ 80031f8:	080095c8 	.word	0x080095c8
 
 080031fc <HAL_RCC_GetPCLK2Freq>:
   * @note   Each time PCLK2 changes, this function must be called to update the
@@ -7946,7 +7946,7 @@ uint32_t HAL_RCC_GetPCLK2Freq(void)
  8003218:	4618      	mov	r0, r3
  800321a:	bd80      	pop	{r7, pc}
  800321c:	40023800 	.word	0x40023800
- 8003220:	080095b8 	.word	0x080095b8
+ 8003220:	080095c8 	.word	0x080095c8
 
 08003224 <HAL_SPI_Init>:
   * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
@@ -14364,10 +14364,10 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  800583e:	4798      	blx	r3
  8005840:	3601      	adds	r6, #1
  8005842:	e7f2      	b.n	800582a <__libc_init_array+0x1e>
- 8005844:	080095fc 	.word	0x080095fc
- 8005848:	080095fc 	.word	0x080095fc
- 800584c:	080095fc 	.word	0x080095fc
- 8005850:	08009600 	.word	0x08009600
+ 8005844:	0800960c 	.word	0x0800960c
+ 8005848:	0800960c 	.word	0x0800960c
+ 800584c:	0800960c 	.word	0x0800960c
+ 8005850:	08009610 	.word	0x08009610
 
 08005854 <__retarget_lock_acquire_recursive>:
  8005854:	4770      	bx	lr
@@ -14873,11 +14873,11 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  8005cdc:	4638      	mov	r0, r7
  8005cde:	f000 f879 	bl	8005dd4 <_printf_i>
  8005ce2:	e7ed      	b.n	8005cc0 <_svfiprintf_r+0x1c0>
- 8005ce4:	080095c0 	.word	0x080095c0
- 8005ce8:	080095ca 	.word	0x080095ca
+ 8005ce4:	080095d0 	.word	0x080095d0
+ 8005ce8:	080095da 	.word	0x080095da
  8005cec:	00000000 	.word	0x00000000
  8005cf0:	08005a49 	.word	0x08005a49
- 8005cf4:	080095c6 	.word	0x080095c6
+ 8005cf4:	080095d6 	.word	0x080095d6
 
 08005cf8 <_printf_common>:
  8005cf8:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
@@ -15206,8 +15206,8 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  8006000:	2500      	movs	r5, #0
  8006002:	f104 0619 	add.w	r6, r4, #25
  8006006:	e7f5      	b.n	8005ff4 <_printf_i+0x220>
- 8006008:	080095d1 	.word	0x080095d1
- 800600c:	080095e2 	.word	0x080095e2
+ 8006008:	080095e1 	.word	0x080095e1
+ 800600c:	080095f2 	.word	0x080095f2
 
 08006010 <memmove>:
  8006010:	4288      	cmp	r0, r1
